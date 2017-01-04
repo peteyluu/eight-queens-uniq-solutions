@@ -10,8 +10,8 @@ typedef struct coord
 	int y;
 } point;
 
-point *first_soln_coords;
-int first_soln_pos;
+point *curr_soln_coords;
+int curr_soln_pos;
 point *queen_coords;
 int queen_coord_pos;
 int num_queens;
@@ -24,104 +24,67 @@ void create_coord(int row, int col);
 void free_array(int **grid);
 void print_coords(point *coords);
 void copy_coords(point *, point *);
-int test_queens(int **grid, point *coords);
+int permute_queens(int **grid, point *coords);
 
 int ft_eight_queens_puzzle(void)
 {
 	int num, **grid;
 
 	num = 0;
-	// stores the coords for the first solution
-	first_soln_coords = (point*)malloc(sizeof(point) * DIM);
-
+	curr_soln_coords = (point*)malloc(sizeof(point) * DIM);
 	num_queens = 0;
-	// stores the queen coords placed
 	queen_coords = (point*)malloc(sizeof(point) * DIM);
 	queen_coord_pos = 0;
 	grid = (int**)malloc(sizeof(int*) * DIM);
 	init_grid(grid);
 	if (solve_queens(grid, 0))
 	{
-		copy_coords(queen_coords, first_soln_coords);
+		copy_coords(queen_coords, curr_soln_coords);
 		num++;
 	}
-	render(grid);
-	printf("%c", '\n');
-	//print_coords(queen_coords);
-	printf("%c", '\n');
 	free(queen_coords);
 	free_array(grid);
-	print_coords(first_soln_coords);
 
-	// 2nd run
 	while (1)
 	{
-		first_soln_pos = 0;
+		curr_soln_pos = 0;
 		num_queens = 0;
 		queen_coords = (point*)malloc(sizeof(point) * DIM);
 		queen_coord_pos = 0;
 		grid = (int**)malloc(sizeof(int*) * DIM);
 		init_grid(grid);
-		if (test_queens(grid, first_soln_coords))
+		if (permute_queens(grid, curr_soln_coords))
 		{
 			num++;
-			copy_coords(queen_coords, first_soln_coords);
+			copy_coords(queen_coords, curr_soln_coords);
 		}
 		else
 			break;
-		render(grid);
 		free(queen_coords);
 		free_array(grid);
-		printf("%c", '\n');
-		print_coords(first_soln_coords);
-		printf("%c", '\n');
 	}
+	free(curr_soln_coords);
 	return (num);
 }
 
-void copy_coords(point *queen_coords, point *first_soln_coords)
-{
-	int i;
-	
-	i = 0;
-	while (i < DIM)
-	{
-		first_soln_coords[i].x = queen_coords[i].x;
-		first_soln_coords[i].y = queen_coords[i].y;
-		i++;
-	}
-}
-
-void print_coords(point *coords)
-{
-	int i;
-	
-	i = 0;
-	while (i < DIM)
-	{
-		printf("[%d, %d]\n", coords[i].x, coords[i].y);
-		i++;
-	}
-}
-
-int test_queens(int **grid, point *coords)
+int permute_queens(int **grid, point *coords)
 {
 	int row, col;
 
 	if (num_queens == N_QUEENS)
 		return (1);
-	if (first_soln_pos < DIM)
-		row = coords[first_soln_pos].x;
+	if (curr_soln_pos < DIM)
+		row = coords[curr_soln_pos].x;
 	else
 		row = queen_coords[queen_coord_pos - 1].x + 1;
 	while (row < DIM)
 	{
-		if (first_soln_pos < DIM)
+		if (curr_soln_pos < DIM)
 		{
-			col = coords[first_soln_pos].y;
-			if (first_soln_pos == DIM - 1)
+			col = coords[curr_soln_pos].y;
+			if (curr_soln_pos == DIM - 1)
 				col++;
-			first_soln_pos++;
+			curr_soln_pos++;
 		}
 		else
 			col = 0;
@@ -133,7 +96,7 @@ int test_queens(int **grid, point *coords)
 				num_queens++;
 				create_coord(row, col);
 				queen_coord_pos++;
-				if (!test_queens(grid, coords))
+				if (!permute_queens(grid, coords))
 				{
 					grid[row][col] = 0;
 					num_queens--;
@@ -209,6 +172,31 @@ int queen_safe(int row, int col)
 		tmp++;
 	}
 	return (1);
+}
+
+void copy_coords(point *queen_coords, point *curr_soln_coords)
+{
+	int i;
+	
+	i = 0;
+	while (i < DIM)
+	{
+		curr_soln_coords[i].x = queen_coords[i].x;
+		curr_soln_coords[i].y = queen_coords[i].y;
+		i++;
+	}
+}
+
+void print_coords(point *coords)
+{
+	int i;
+	
+	i = 0;
+	while (i < DIM)
+	{
+		printf("[%d, %d]\n", coords[i].x, coords[i].y);
+		i++;
+	}
 }
 
 void create_coord(int row, int col)
