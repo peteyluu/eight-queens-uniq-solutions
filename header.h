@@ -1,3 +1,6 @@
+#ifndef HDR
+#define HDR
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -25,3 +28,4 @@ void free_array(int **grid);
 void print_coords(point *coords);
 void copy_coords(point *, point *);
 int permute_queens(int **grid, point *coords);
+#endif
